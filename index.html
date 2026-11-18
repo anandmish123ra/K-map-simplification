@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>K-Map Simplifier | Digital Logic Project</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Left Navigation Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo-icon">K</div>
+        <div>
+          <h2>K-Map Studio</h2>
+          <span>Boolean Logic Tool</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-btn active" data-tab="solver-tab">
+          <span class="icon">⚡</span> K-Map Solver
+        </button>
+        <button class="nav-btn" data-tab="theory-tab">
+          <span class="icon">📘</span> Theory & Concepts
+        </button>
+        <button class="nav-btn" data-tab="rules-tab">
+          <span class="icon">📐</span> Grouping Rules
+        </button>
+        <button class="nav-btn" data-tab="history-tab">
+          <span class="icon">🏛️</span> History of K-Map
+        </button>
+        <button class="nav-btn" data-tab="about-tab">
+          <span class="icon">ℹ️</span> About Project
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <p>Digital Electronics & Logic Design</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <!-- TAB 1: K-MAP SOLVER -->
+      <section id="solver-tab" class="tab-section active">
+        <header class="page-header">
+          <h1>Karnaugh Map Simplifier</h1>
+          <p>Interactive Boolean Algebra Minimization Tool (SOP Form)</p>
+        </header>
+
+        <div class="controls">
+          <div class="control-group">
+            <label for="var-count">Variables:</label>
+            <select id="var-count">
+              <option value="2">2 Variables (A, B)</option>
+              <option value="3">3 Variables (A, B, C)</option>
+              <option value="4" selected>4 Variables (A, B, C, D)</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="minterm-input">Minterms:</label>
+            <input type="text" id="minterm-input" placeholder="e.g., 0, 1, 2, 5, 8, 10, 14" />
+            <button id="apply-minterms" class="btn primary">Plot Minterms</button>
+          </div>
+
+          <div class="control-group actions">
+            <button id="fill-ones" class="btn secondary">All 1s</button>
+            <button id="clear-btn" class="btn danger">Reset</button>
+          </div>
+        </div>
+
+        <div class="workspace">
+          <div class="card kmap-card">
+            <h2>Interactive K-Map Grid</h2>
+            <p class="hint">Click any cell to toggle: <strong>0</strong> &rarr; <strong>1</strong> &rarr; <strong>X</strong> (Don't Care)</p>
+            <div id="kmap-container" class="kmap-wrapper"></div>
+          </div>
+
+          <div class="card output-card">
+            <h2>Simplification Result</h2>
+            <div class="result-box">
+              <span class="label">Minimal SOP Expression:</span>
+              <div id="sop-output" class="expression">0</div>
+            </div>
+
+            <div class="result-box">
+              <span class="label">Prime Implicant Groups:</span>
+              <ul id="groups-list" class="groups-list">
+                <li>No active groups</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: THEORY & CONCEPTS -->
+      <section id="theory-tab" class="tab-section">
+        <header class="page-header">
+          <h1>Theory & Fundamental Concepts</h1>
+          <p>Understanding Karnaugh Maps in Digital Logic Design</p>
+        </header>
+
+        <div class="theory-grid">
+          <div class="card theory-card">
+            <h3>What is a Karnaugh Map?</h3>
+            <p>A <strong>Karnaugh Map (K-Map)</strong> is a visual, grid-based method used to simplify Boolean algebra expressions without needing complex algebraic theorems. It converts a truth table into a two-dimensional grid where adjacent cells differ by only <strong>one bit</strong> (Gray Code ordering).</p>
+          </div>
+
+          <div class="card theory-card">
+            <h3>Why Gray Code Ordering?</h3>
+            <p>Rows and columns are labeled using <strong>Gray Code</strong> (<code>00, 01, 11, 10</code>) instead of standard binary (<code>00, 01, 10, 11</code>). This guarantees that physically adjacent cells—as well as cells on opposite outer edges—change by only a single variable, allowing that variable to be eliminated when grouped.</p>
+          </div>
+
+          <div class="card theory-card">
+            <h3>Minterms & SOP Form</h3>
+            <p><strong>Sum of Products (SOP)</strong> represents a Boolean function as an OR sum of AND terms (minterms). Each cell containing a <code>1</code> represents a minterm where the output of the logic circuit is HIGH.</p>
+          </div>
+
+          <div class="card theory-card">
+            <h3>Don't Care Conditions (X)</h3>
+            <p>A <strong>Don't Care (X)</strong> condition occurs when certain input combinations never happen or their output does not matter. In a K-Map, <code>X</code> cells can be treated as either <code>1</code> or <code>0</code>—whichever helps form larger groups and simpler logic circuits.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: GROUPING RULES -->
+      <section id="rules-tab" class="tab-section">
+        <header class="page-header">
+          <h1>K-Map Grouping Rules</h1>
+          <p>Step-by-step principles for obtaining the minimal Boolean expression</p>
+        </header>
+
+        <div class="card theory-card full-width">
+          <ul class="rules-list">
+            <li><strong>1. Power of Two Rule:</strong> Groups must contain $1, 2, 4, 8,$ or $16$ cells ($2^n$). Groups of $3, 5,$ or $6$ are invalid.</li>
+            <li><strong>2. Maximize Group Size:</strong> Always make each group as large as possible. Larger groups eliminate more variables (e.g., a group of 4 eliminates 2 variables in a 4-variable K-Map).</li>
+            <li><strong>3. Horizontal & Vertical Only:</strong> Cells can only be grouped horizontally or vertically—never diagonally.</li>
+            <li><strong>4. Wrap-Around Adjacency:</strong> The grid wraps around from top-to-bottom and left-to-right. All four corners of a 4-variable K-Map are adjacent and can form a group of 4.</li>
+            <li><strong>5. Overlapping is Allowed:</strong> A <code>1</code> can belong to more than one group if doing so creates a larger group and simplifies the overall expression.</li>
+            <li><strong>6. Avoid Redundant Groups:</strong> Every group must contain at least one <code>1</code> that is not covered by any other group (Essential Prime Implicant).</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- TAB 4: HISTORY -->
+      <section id="history-tab" class="tab-section">
+        <header class="page-header">
+          <h1>History of the Karnaugh Map</h1>
+          <p>Evolution of graphical logic minimization</p>
+        </header>
+
+        <div class="timeline">
+          <div class="card timeline-item">
+            <span class="year-badge">1952</span>
+            <h3>Veitch Charts</h3>
+            <p>Edward W. Veitch introduced the initial grid-based diagram for simplifying switching functions, laying the groundwork for graphical Boolean minimization.</p>
+          </div>
+
+          <div class="card timeline-item">
+            <span class="year-badge">1953</span>
+            <h3>Maurice Karnaugh's Invention</h3>
+            <p><strong>Maurice Karnaugh</strong>, a physicist and mathematician at Bell Labs, refined Veitch's diagram by introducing Gray Code ordering and wrap-around adjacency, publishing the modern Karnaugh Map in his paper <em>"The Map Method for Synthesis of Combinational Logic Circuits."</em></p>
+          </div>
+
+          <div class="card timeline-item">
+            <span class="year-badge">1956</span>
+            <h3>Quine-McCluskey Algorithm</h3>
+            <p>Willard Van Orman Quine and Edward J. McCluskey developed the tabular algorithmic equivalent of K-Maps, allowing computers to automate minimization for functions with more than 4 variables—the exact engine powering this web application.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: ABOUT PROJECT -->
+      <section id="about-tab" class="tab-section">
+        <header class="page-header">
+          <h1>About This Project</h1>
+          <p>Architecture, Tech Stack, and Educational Purpose</p>
+        </header>
+
+        <div class="theory-grid">
+          <div class="card theory-card">
+            <h3>Project Objective</h3>
+            <p>This tool was built to bridge theoretical Digital Logic Design with interactive web visualization, helping students verify K-Map solutions, experiment with Don't Care terms, and inspect Prime Implicant groups in real time.</p>
+          </div>
+
+          <div class="card theory-card">
+            <h3>Technology Stack</h3>
+            <ul class="tech-list">
+              <li><strong>HTML5:</strong> Semantic layout and multi-view navigation architecture.</li>
+              <li><strong>CSS3:</strong> Custom Cyber-Neon theme, CSS Grid, Flexbox, and keyframe micro-animations.</li>
+              <li><strong>Vanilla JavaScript (ES6+):</strong> Dynamic Gray Code grid generator and Quine-McCluskey Prime Implicant solver.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
